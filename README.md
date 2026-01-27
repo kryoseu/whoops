@@ -60,11 +60,17 @@ Update `SQLALCHEMY_DATABASE_URI` depending on your database:
 > [!TIP]
 > The app will automatically refresh tokens and export your data every 24 hours.
 
+# Visualizing Your Data
+## Whoops UI (Recommended for a Simple Setup)
+For a lightweight, purpose-built UI to explore your Whoop metrics, you can use [whoops-ui](https://github.com/kryoseu/whoops-ui).
 
-# Grafana
+`whoops-ui` retrieves data directly from `whoops` or the Whoop API and provides a clean web interface for exploring and visualizing your data, including support for custom graphs and dashboards—without requiring Grafana.
+
+## Grafana
 If you have [Grafana](https://grafana.com/docs/grafana/latest/setup-grafana/installation/) installed, you can import the provided [dashboard JSON](https://github.com/kryoseu/whoops/blob/main/templates/grafana.json) to visualize your Whoop data.
 
 <img width="1266" height="1229" alt="251019_18h07m38s_screenshot" src="https://github.com/user-attachments/assets/ac026d07-dfc6-4f10-bbec-2d62fc81be3c" />
+
 
 
 
