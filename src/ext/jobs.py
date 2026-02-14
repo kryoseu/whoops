@@ -25,17 +25,17 @@ def refresh_token_job(app):
             logger.error("Manual authorization required. Visit /authorize.")
 
 
-def export_job(app):
-    logger.info("Running export job")
+def import_job(app):
+    logger.info("Running import job")
     try:
-        run_export(app)
-        logger.info("Data exported successfully.")
+        run_import(app)
+        logger.info("Data imported successfully.")
     except requests.HTTPError as e:
         logger.error(e)
 
 
 @retry(requests.HTTPError, tries=3, delay=2, backoff=2)
-def run_export(app):
+def run_import(app):
     whoop_client = app.config["WhoopClient"]
 
     cycles = whoop_client.get_cycles()

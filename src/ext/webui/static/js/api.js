@@ -1,15 +1,15 @@
 export const API = {
-  async exportNow() {
+  async importNow() {
     try {
-      const response = await fetch("/export", { method: "POST" });
-      if (!response.ok) throw new Error(`Failed to export (status: ${response.status})`);
-      return { success: true, message: "Export completed successfully" };
+      const response = await fetch("/import", { method: "POST" });
+      if (!response.ok) throw new Error(`Failed to import (status: ${response.status})`);
+      return { success: true, message: "Import completed successfully" };
     } catch (err) {
       return { success: false, message: err.message };
     }
   },
 
-  async scheduleExport(hour, minute) {
+  async scheduleImport(hour, minute) {
     try {
       const response = await fetch("/schedule", {
         method: "POST",

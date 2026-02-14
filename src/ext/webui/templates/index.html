@@ -25,9 +25,9 @@
   </div>
 
   <div class="card">
-    <p class="small text-muted wait" style="margin-bottom: 10px;"> Exporting.. </p>
-    <button id="export-button" class="btn btn-primary" style="margin-bottom:10px;">Export Now</button>
-    <p class="small text-muted"> Immediately export data to the database. </p>
+    <p class="small text-muted wait" style="margin-bottom: 10px;"> Importing.. </p>
+    <button id="import-button" class="btn btn-primary" style="margin-bottom:10px;">Import Now</button>
+    <p class="small text-muted"> Immediately import data into the database. </p>
   </div>
 
   <div class="card">
@@ -37,8 +37,8 @@
     <label for="minute-input">Minute:</label>
     <input type="number" id="minute-input" min="0" max="59" class="form-control">
 
-    <button id="schedule-button" class="btn btn-success">Schedule Export</button>
-    <p class="small text-muted"> Export will run daily at the chosen time. </p>
+    <button id="schedule-button" class="btn btn-success">Schedule import</button>
+    <p class="small text-muted"> Import will run daily at the chosen time. </p>
   </div>
 
   <script type="module" src="{{ url_for('webui.static', filename='js/index.js') }}"></script>

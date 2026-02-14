@@ -13,17 +13,17 @@ function showAlert(message, type = "success") {
 
 document.addEventListener("DOMContentLoaded", () => {
   const wait = document.querySelector(".wait");
-  const exportBtn = document.getElementById("export-button");
+  const importBtn = document.getElementById("import-button");
   const scheduleBtn = document.getElementById("schedule-button");
 
-  exportBtn.addEventListener("click", async () => {
-    exportBtn.disabled = true;
+  importBtn.addEventListener("click", async () => {
+    importBtn.disabled = true;
     wait.style.visibility = "visible";
 
-    const result = await API.exportNow();
+    const result = await API.importNow();
     showAlert(result.message, result.success ? "success" : "danger");
 
-    exportBtn.disabled = false;
+    importBtn.disabled = false;
     wait.style.visibility = "hidden";
   });
 
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const hour = document.getElementById("hour-input").value;
     const minute = document.getElementById("minute-input").value;
 
-    const result = await API.scheduleExport(hour, minute);
+    const result = await API.scheduleImport(hour, minute);
     showAlert(result.message, result.success ? "success" : "danger");
   });
 });

@@ -13,7 +13,7 @@ from flask import (
 )
 
 from src.ext.database import add_all, query_all
-from src.ext.jobs import export_job, run_export
+from src.ext.jobs import import_job, run_import
 from src.models.cycle import WhoopCycle
 from src.models.recovery import WhoopRecovery
 from src.models.sleep import WhoopSleep
@@ -73,17 +73,17 @@ def callback():
     return redirect(url_for("webui.index"))
 
 
-def export():
+def manual_import():
     """
-    Retrieve and export Whoop data.
+    Manual retrieve and import Whoop data.
     """
-    logger.info("Starting export via web UI")
+    logger.info("Starting import via web UI")
 
     try:
-        run_export(current_app)
+        run_import(current_app)
 
-        flash("Export finished", "success")
-        return jsonify({"message": "Export finished"}), 201
+        flash("Import finished", "success")
+        return jsonify({"message": "Import finished"}), 201
 
     except requests.HTTPError as e:
         logger.error(e)
@@ -92,7 +92,7 @@ def export():
 
 def schedule():
     """
-    Schedule data export.
+    Schedule data import.
     """
 
     scheduler = current_app.config.get("Scheduler")
@@ -121,15 +121,15 @@ def schedule():
         abort(400, description="Invalid input")
 
     scheduler.add_job(
-        func=export_job,
+        func=import_job,
         trigger="cron",
         hour=hour,
         minute=minute,
         args=[current_app._get_current_object()],  # type: ignore
-        id="export_job",
+        id="import_job",
         replace_existing=True,
     )
 
-    logger.info("Export job scheduled")
+    logger.info("Import job scheduled")
 
-    return {"message": "Export scheduled successfully"}, 201
+    return {"message": "Import scheduled successfully"}, 201

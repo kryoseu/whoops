@@ -3,11 +3,13 @@
 
 # Whoops
 
-Whoops is a simple Flask application that exports your Whoop data into a PostgreSQL or MySQL database.  
+Whoops is a simple Flask application that imports your Whoop data into a PostgreSQL or MySQL database.  
 
 **Features:**
-- Manual and daily exports.
+
+- Manual and daily imports.
 - Automatic API token refresh.
+
 ## Requirements
 
 - Docker (or a Kubernetes cluster)
@@ -17,10 +19,13 @@ Whoops is a simple Flask application that exports your Whoop data into a Postgre
 > The redirect URL configured for your Whoop app must match the URL where Whoops will run (e.g., `http://localhost:5000/callback`).
 
 # Getting Started
+
 Example Docker compose file and kubernetes manifests are provided in the [templates](https://github.com/kryoseu/whoops/tree/main/templates) section, which also include how to install a database along with Whoops, in case you don't have one yet.
 
 ## With Docker
+
 Using Docker compose:
+
 ```yaml
 services:
   whoops:
@@ -35,6 +40,7 @@ services:
       SQLALCHEMY_DATABASE_URI: "postgresql+psycopg2://whoops:whoops@127.0.0.1:5432/whoop_data"
     restart: unless-stopped
 ```
+
 or Docker run:
 
 ```bash
@@ -49,33 +55,28 @@ docker run -d \
 ```
 
 Update `SQLALCHEMY_DATABASE_URI` depending on your database:
+
 - PostgreSQL: `postgresql+psycopg2://<user>:<password>@<host>:5432/whoop_data`
 - MySQL: `mysql+pymysql://<user>:<password>@<host>:3306/whoop_data`
 
 # Usage
 
 1. Navigate to [http://localhost:5000/authorize](http://localhost:5000/authorize) to authorize Whoops to access your Whoop data.
-2. Navigate to [http://localhost:5000](http://localhost:5000) to set when export job runs or trigger a manual export.
+2. Navigate to [http://localhost:5000](http://localhost:5000) to set when import job runs or trigger a manual import.
 
 > [!TIP]
-> The app will automatically refresh tokens and export your data every 24 hours.
+> The app will automatically refresh tokens and import your data every 24 hours.
 
 # Visualizing Your Data
+
 ## Whoops UI (Recommended for a Simple Setup)
+
 For a lightweight, purpose-built UI to explore your Whoop metrics, you can use [whoops-ui](https://github.com/kryoseu/whoops-ui).
 
 `whoops-ui` retrieves data directly from `whoops` or the Whoop API and provides a clean web interface for exploring and visualizing your data, including support for custom graphs and dashboards—without requiring Grafana.
 
 ## Grafana
+
 If you have [Grafana](https://grafana.com/docs/grafana/latest/setup-grafana/installation/) installed, you can import the provided [dashboard JSON](https://github.com/kryoseu/whoops/blob/main/templates/grafana.json) to visualize your Whoop data.
 
 <img width="1266" height="1229" alt="251019_18h07m38s_screenshot" src="https://github.com/user-attachments/assets/ac026d07-dfc6-4f10-bbec-2d62fc81be3c" />
-
-
-
-
-
-
-
-
-
