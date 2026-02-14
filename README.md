@@ -1,6 +1,6 @@
 [![Python](https://img.shields.io/badge/python-3.13-blue?style=flat-square)](https://www.python.org/downloads/release/python-3130/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-
+[![](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Ko--fi-red?style=flat-square)](https://ko-fi.com/kryoseu)
 # Whoops
 
 Whoops is a simple Flask application that imports your Whoop data into a PostgreSQL or MySQL database.  
@@ -80,3 +80,12 @@ For a lightweight, purpose-built UI to explore your Whoop metrics, you can use [
 If you have [Grafana](https://grafana.com/docs/grafana/latest/setup-grafana/installation/) installed, you can import the provided [dashboard JSON](https://github.com/kryoseu/whoops/blob/main/templates/grafana.json) to visualize your Whoop data.
 
 <img width="1266" height="1229" alt="251019_18h07m38s_screenshot" src="https://github.com/user-attachments/assets/ac026d07-dfc6-4f10-bbec-2d62fc81be3c" />
+
+## Support This Project ☕️
+
+If you like **Whoops** and want to help keep it improving, you can support me via:
+
+[![Buy me a coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Ko--fi-red?style=flat-square)](https://ko-fi.com/kryoseu)
+
+Thank you for your support! 💛
+
