@@ -4,6 +4,8 @@ import os
 from dynaconf import FlaskDynaconf
 from flask import Flask
 
+from src.utils import ImportStatus
+
 from .whoop import WhoopClient
 
 REQUIRED_VARS = [
@@ -26,6 +28,9 @@ def create_app():
 
     app = Flask(__name__)
     FlaskDynaconf(app)
+
+    app.config["ImportQueue"] = set()
+    app.config["LastImportStatus"] = ImportStatus.NOT_STARTED
 
     app.config["WhoopClient"] = WhoopClient(
         os.getenv("CLIENT_ID", ""),

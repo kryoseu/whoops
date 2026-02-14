@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-from .views import authorize, callback, manual_import, index, schedule
+from .views import authorize, callback, manual_import, index, schedule, status
 
 schedule.methods = ["POST"]  # type: ignore
 manual_import.methods = ["POST"]  # type: ignore
@@ -18,6 +18,7 @@ bp.add_url_rule("/authorize", view_func=authorize)
 bp.add_url_rule("/callback", view_func=callback)
 bp.add_url_rule("/import", view_func=manual_import)
 bp.add_url_rule("/schedule", view_func=schedule)
+bp.add_url_rule("/import/status", view_func=status)
 
 
 def init_app(app):

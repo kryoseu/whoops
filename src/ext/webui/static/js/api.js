@@ -3,7 +3,7 @@ export const API = {
     try {
       const response = await fetch("/import", { method: "POST" });
       if (!response.ok) throw new Error(`Failed to import (status: ${response.status})`);
-      return { success: true, message: "Import completed successfully" };
+      return { success: true, message: "Import tasks queued" };
     } catch (err) {
       return { success: false, message: err.message };
     }
@@ -23,4 +23,15 @@ export const API = {
       return { success: false, message: err.message };
     }
   },
+
+  async getImportStatus() {
+    try {
+      const response = await fetch("/import/status");
+      if (!response.ok) throw new Error(`Failed to get status (status: ${response.status})`);
+      const data = await response.json();
+      return { success: true, data };
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+  }
 };

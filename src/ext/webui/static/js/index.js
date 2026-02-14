@@ -25,6 +25,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     importBtn.disabled = false;
     wait.style.visibility = "hidden";
+
+
+    fetchImportStatus();
   });
 
   scheduleBtn.addEventListener("click", async () => {
@@ -34,4 +37,47 @@ document.addEventListener("DOMContentLoaded", () => {
     const result = await API.scheduleImport(hour, minute);
     showAlert(result.message, result.success ? "success" : "danger");
   });
+
+  fetchImportStatus();
+  startPolling();
 });
+
+
+async function fetchImportStatus() {
+  const result = await API.getImportStatus();
+
+  if (!result.success) {
+    console.error(result.message);
+    return;
+  }
+
+  const { backlog, last_status } = result.data;
+
+  const backlogBadge = document.getElementById("backlog-badge");
+  const statusBadge = document.getElementById("status-badge");
+
+  backlogBadge.textContent = backlog ?? 0;
+  statusBadge.textContent = last_status ?? "N/A";
+
+  if (backlog > 0) {
+    backlogBadge.classList.remove("badge-primary");
+    backlogBadge.classList.add("badge-warning");
+  } else {
+    backlogBadge.classList.remove("badge-warning");
+    backlogBadge.classList.add("badge-primary");
+  }
+}
+
+let statusInterval;
+
+function startPolling() {
+  let running = false;
+
+  statusInterval = setInterval(async () => {
+    if (running) return;
+    running = true;
+    await fetchImportStatus();
+    running = false;
+  }, 5000);
+}
+

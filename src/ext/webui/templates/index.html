@@ -30,7 +30,7 @@
     <p class="small text-muted"> Immediately import data into the database. </p>
   </div>
 
-  <div class="card">
+  <div class="card" style="margin-bottom: 30px;">
     <label for="hour-input">Hour:</label>
     <input type="number" id="hour-input" min="0" max="23" class="form-control">
 
@@ -39,6 +39,21 @@
 
     <button id="schedule-button" class="btn btn-success">Schedule import</button>
     <p class="small text-muted"> Import will run daily at the chosen time. </p>
+  </div>
+
+
+  <div class="jumbotron">
+    <h2>Import progress</h2>
+    <ul id="task-backlog" class="list-group">
+        <li class="list-group-item">
+          Backlog
+          <span id="backlog-badge" class="badge badge-primary badge-pill"></span>
+        </li>
+        <li class="list-group-item">
+          Last status
+          <span id="status-badge" class="badge badge-primary"></span>
+        </li>
+    </ul>
   </div>
 
   <script type="module" src="{{ url_for('webui.static', filename='js/index.js') }}"></script>

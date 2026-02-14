@@ -12,13 +12,13 @@ from flask import (
     url_for,
 )
 
-from src.ext.database import add_all, query_all
-from src.ext.jobs import import_job, run_import
+from src.ext.database import query_all
+from src.ext.jobs import fill_backlog
 from src.models.cycle import WhoopCycle
 from src.models.recovery import WhoopRecovery
 from src.models.sleep import WhoopSleep
 from src.models.workout import WhoopWorkout
-from src.retry import retry
+from src.utils import ImportStatus
 
 logger = logging.getLogger(__name__)
 
@@ -79,15 +79,8 @@ def manual_import():
     """
     logger.info("Starting import via web UI")
 
-    try:
-        run_import(current_app)
-
-        flash("Import finished", "success")
-        return jsonify({"message": "Import finished"}), 201
-
-    except requests.HTTPError as e:
-        logger.error(e)
-        abort(e.response.status_code, description=e)
+    fill_backlog(current_app)
+    return jsonify({"message": "Import tasks queued"}), 201
 
 
 def schedule():
@@ -121,7 +114,7 @@ def schedule():
         abort(400, description="Invalid input")
 
     scheduler.add_job(
-        func=import_job,
+        func=fill_backlog,
         trigger="cron",
         hour=hour,
         minute=minute,
@@ -133,3 +126,14 @@ def schedule():
     logger.info("Import job scheduled")
 
     return {"message": "Import scheduled successfully"}, 201
+
+
+def status():
+    """
+    Get the status of the import queue.
+    """
+
+    import_queue = current_app.config.get("ImportQueue", [])
+    last_status = current_app.config.get("LastImportStatus", ImportStatus.UNKNOWN)
+
+    return {"backlog": len(import_queue), "last_status": last_status.value}, 200
