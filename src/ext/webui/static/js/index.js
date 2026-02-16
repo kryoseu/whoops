@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   scheduleBtn.addEventListener("click", async () => {
     const hour = document.getElementById("hour-input").value;
-    const minute = document.getElementById("minute-input").value;
+    const minute = document.getElementById("minute-input").value || "0";
 
     const result = await API.scheduleImport(hour, minute);
     showAlert(result.message, result.success ? "success" : "danger");
