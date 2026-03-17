@@ -77,9 +77,9 @@ For a lightweight, purpose-built UI to explore your Whoop metrics, you can use [
 
 ## Grafana
 
-If you have [Grafana](https://grafana.com/docs/grafana/latest/setup-grafana/installation/) installed, you can import the provided [dashboard JSON](https://github.com/kryoseu/whoops/blob/main/templates/grafana.json) to visualize your Whoop data.
+If you have [Grafana](https://grafana.com/docs/grafana/latest/setup-grafana/installation/) installed, you can import the provided [dashboard](https://grafana.com/grafana/dashboards/25022-whoops-recovery-sleep-insights/) to visualize your Whoop data.
 
-<img width="1266" height="1229" alt="251019_18h07m38s_screenshot" src="https://github.com/user-attachments/assets/ac026d07-dfc6-4f10-bbec-2d62fc81be3c" />
+<img width="1249" height="1222" alt="260317_11h15m30s_screenshot" src="https://github.com/user-attachments/assets/b726578d-9b30-472b-a51f-249d2ddb84cc" />
 
 ## Support This Project ☕️
 
