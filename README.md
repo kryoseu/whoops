@@ -9,6 +9,7 @@ Whoops is a simple Flask application that imports your Whoop data into a Postgre
 
 - Manual and daily imports.
 - Automatic API token refresh.
+- Import of the Whoop data export (CSV), including the Journal which the API does not provide.
 
 ## Requirements
 
@@ -67,6 +68,45 @@ Update `SQLALCHEMY_DATABASE_URI` depending on your database:
 > [!TIP]
 > The app will automatically refresh tokens and import your data every 24 hours.
 
+## Importing a Whoop data export
+
+The Whoop app can export your data as CSV files (**Settings > Data Export**, delivered as a zip).
+The export contains data the Whoop API does not provide:
+
+| Data | Whoop API | Data export |
+| --- | --- | --- |
+| Journal answers (alcohol, caffeine, custom questions...) and notes | No | Yes |
+| Total sleep need, time asleep | Parts only | Yes |
+| Workout GPS flag | No | Yes |
+
+Upload the zip, or any of its CSV files, from [http://localhost:5000](http://localhost:5000), or with curl:
+
+```bash
+curl -F file=@my_whoop_data_2026_02_10.zip http://localhost:5000/import/export
+```
+
+Each file is stored in its own table, next to the API tables which are left untouched:
+
+| File | Table | Key |
+| --- | --- | --- |
+| `physiological_cycles.csv` | `whoop_export_cycle` | `cycle_start` |
+| `sleeps.csv` | `whoop_export_sleep` | `sleep_onset` |
+| `workouts.csv` | `whoop_export_workout` | `workout_start` |
+| `journal_entries.csv` | `whoop_export_journal` | `cycle_start`, `question` |
+
+Times are stored in UTC and durations in milliseconds, like the API tables. Every export contains your full
+history, so importing a newer one updates the existing rows. Upload the files as exported: CSV files re-saved by
+a spreadsheet app (other separators and date formats) are rejected.
+
+Journal answers given on waking are attached by Whoop to the cycle that starts with that night's sleep. To relate a
+behavior to its recovery, join both tables on `cycle_start`:
+
+```sql
+SELECT j.question, j.answered_yes, c.recovery_score, c.hrv_rmssd_ms
+FROM whoop_export_journal j
+JOIN whoop_export_cycle c ON c.cycle_start = j.cycle_start;
+```
+
 # Visualizing Your Data
 
 ## Whoops UI (Recommended for a Simple Setup)
@@ -78,6 +118,10 @@ For a lightweight, purpose-built UI to explore your Whoop metrics, you can use [
 ## Grafana
 
 If you have [Grafana](https://grafana.com/docs/grafana/latest/setup-grafana/installation/) installed, you can import the provided [dashboard](https://grafana.com/grafana/dashboards/25022-whoops-recovery-sleep-insights/) to visualize your Whoop data.
+
+The [dashboard template](templates/grafana.json) also has a **Journal (Whoop data export)** row, filled once an export is imported:
+how each journal behavior relates to recovery, HRV, resting heart rate and sleep performance, a log of your answers,
+and sleep need against time asleep.
 
 <img width="1249" height="1222" alt="260317_11h15m30s_screenshot" src="https://github.com/user-attachments/assets/b726578d-9b30-472b-a51f-249d2ddb84cc" />
 

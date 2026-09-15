@@ -43,6 +43,17 @@ def add_all(models):
             raise
 
 
+def merge_all(models):
+    """Insert or update a list of models by primary key, in one transaction."""
+    try:
+        for model in models:
+            db.session.merge(model)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
+
+
 def init_app(app):
     """Initializes the database extension."""
     db.init_app(app)

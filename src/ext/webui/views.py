@@ -12,13 +12,20 @@ from flask import (
     url_for,
 )
 
-from src.ext.database import query_all
+from src.ext.database import merge_all, query_all
 from src.ext.jobs import fill_backlog
 from src.models.cycle import WhoopCycle
+from src.models.export import (
+    WhoopExportCycle,
+    WhoopExportJournal,
+    WhoopExportSleep,
+    WhoopExportWorkout,
+)
 from src.models.recovery import WhoopRecovery
 from src.models.sleep import WhoopSleep
 from src.models.workout import WhoopWorkout
 from src.utils import ImportStatus
+from src.whoop_export import ExportFormatError, read_export
 
 logger = logging.getLogger(__name__)
 
@@ -32,12 +39,20 @@ def index():
     recoveries = query_all(WhoopRecovery)
     workouts = query_all(WhoopWorkout)
 
+    export_counts = {
+        "Cycles": len(query_all(WhoopExportCycle)),
+        "Sleeps": len(query_all(WhoopExportSleep)),
+        "Workouts": len(query_all(WhoopExportWorkout)),
+        "Journal entries": len(query_all(WhoopExportJournal)),
+    }
+
     return render_template(
         "index.html",
         cycles=cycles,
         sleeps=sleeps,
         recoveries=recoveries,
         workouts=workouts,
+        export_counts=export_counts,
     )
 
 
@@ -81,6 +96,29 @@ def manual_import():
 
     fill_backlog(current_app)
     return jsonify({"message": "Import tasks queued"}), 201
+
+
+def import_export():
+    """
+    Import a Whoop data export (the zip or its CSV files) into the database.
+    Re-importing a newer export updates the rows already imported.
+    """
+    uploads = request.files.getlist("file")
+
+    if not uploads:
+        return {"message": "No file uploaded"}, 400
+
+    try:
+        records = read_export((upload.filename or "", upload.stream) for upload in uploads)
+    except ExportFormatError as e:
+        return {"message": str(e)}, 400
+
+    merge_all([row for rows in records.values() for row in rows])
+
+    imported = {model.FILENAME: len(rows) for model, rows in records.items()}
+    logger.info(f"Whoop export imported: {imported}")
+
+    return {"message": "Export imported", "imported": imported}, 201
 
 
 def schedule():
