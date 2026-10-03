@@ -123,6 +123,10 @@ The [dashboard template](templates/grafana.json) also has a **Journal (Whoop dat
 how each journal behavior relates to recovery, HRV, resting heart rate and sleep performance, a log of your answers,
 and sleep need against time asleep.
 
+A second template, [templates/grafana-export.json](templates/grafana-export.json), is built only on the imported export tables:
+a journal calendar, the yes rate per question, what each journal answer does to recovery (with a selectable lag of 0 or 1 day),
+and workouts per week and per sport, heart-rate zones and strain per workout.
+
 <img width="1249" height="1222" alt="260317_11h15m30s_screenshot" src="https://github.com/user-attachments/assets/b726578d-9b30-472b-a51f-249d2ddb84cc" />
 
 ## Support This Project ☕️
