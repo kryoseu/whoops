@@ -1,9 +1,10 @@
-FROM python:3.13-alpine AS build
+FROM python:3.14-alpine AS build
 RUN apk add --no-cache build-base libpq-dev
+WORKDIR /app
 COPY requirements.txt .
 RUN pip wheel --no-cache-dir --wheel-dir /wheels -r requirements.txt
 
-FROM python:3.13-alpine
+FROM python:3.14-alpine
 RUN apk upgrade --no-cache && apk add --no-cache libpq
 WORKDIR /app
 COPY --from=build /wheels /wheels
