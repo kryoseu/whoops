@@ -22,6 +22,16 @@
           <span class="badge badge-primary badge-pill">{{ workouts | length }}</span>
         </li>
     </ul>
+
+    <h3>From Whoop data export</h3>
+    <ul id="export-items" class="list-group">
+      {% for name, count in export_counts.items() %}
+        <li class="list-group-item">
+          {{ name }}
+          <span class="badge badge-primary badge-pill">{{ count }}</span>
+        </li>
+      {% endfor %}
+    </ul>
   </div>
 
   <div class="card">
@@ -39,6 +49,17 @@
 
     <button id="schedule-button" class="btn btn-success">Schedule import</button>
     <p class="small text-muted"> Import will run daily at the chosen time. </p>
+  </div>
+
+  <div class="card" style="margin-bottom: 30px;">
+    <label for="export-file-input">Whoop data export:</label>
+    <input type="file" id="export-file-input" accept=".zip,.csv" multiple class="form-control">
+
+    <button id="export-button" class="btn btn-primary">Import export</button>
+    <p class="small text-muted">
+      Upload the zip from the Whoop app (Settings &gt; Data Export) or its CSV files. It adds the Journal
+      and other data the API does not provide. Re-importing a newer export updates existing rows.
+    </p>
   </div>
 
 

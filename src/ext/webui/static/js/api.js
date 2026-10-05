@@ -24,6 +24,24 @@ export const API = {
     }
   },
 
+  async importExport(files) {
+    try {
+      const body = new FormData();
+      for (const file of files) body.append("file", file);
+
+      const response = await fetch("/import/export", { method: "POST", body });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.message || `Failed to import export (status: ${response.status})`);
+
+      const summary = Object.entries(data.imported)
+        .map(([filename, count]) => `${filename} (${count} rows)`)
+        .join(", ");
+      return { success: true, message: `Imported ${summary}` };
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+  },
+
   async getImportStatus() {
     try {
       const response = await fetch("/import/status");

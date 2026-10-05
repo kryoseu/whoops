@@ -1,6 +1,12 @@
 from typing import TypeVar
 
 from .cycle import WhoopCycle
+from .export import (
+    WhoopExportCycle,
+    WhoopExportJournal,
+    WhoopExportSleep,
+    WhoopExportWorkout,
+)
 from .recovery import WhoopRecovery
 from .sleep import WhoopSleep
 from .workout import WhoopWorkout

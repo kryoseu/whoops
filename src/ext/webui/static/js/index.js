@@ -15,6 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const wait = document.querySelector(".wait");
   const importBtn = document.getElementById("import-button");
   const scheduleBtn = document.getElementById("schedule-button");
+  const exportBtn = document.getElementById("export-button");
+  const exportInput = document.getElementById("export-file-input");
 
   importBtn.addEventListener("click", async () => {
     importBtn.disabled = true;
@@ -36,6 +38,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const result = await API.scheduleImport(hour, minute);
     showAlert(result.message, result.success ? "success" : "danger");
+  });
+
+  exportBtn.addEventListener("click", async () => {
+    if (!exportInput.files.length) {
+      showAlert("Choose the Whoop export zip or CSV files first", "danger");
+      return;
+    }
+
+    exportBtn.disabled = true;
+    const result = await API.importExport(exportInput.files);
+    showAlert(result.message, result.success ? "success" : "danger");
+    exportBtn.disabled = false;
   });
 
   fetchImportStatus();

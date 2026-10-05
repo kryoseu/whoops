@@ -1,0 +1,647 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Data that only comes from the Whoop data export (whoop_export_* tables, imported via /import/export): journal answers and workouts. Complements 'Whoop — Recovery & Sleep Insights', which reads the API tables.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 10,
+      "title": "Journal",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff0z3vnhywpogc"
+      },
+      "description": "One row per journal question, one cell per day: blue = Yes, dark = No, blank = not answered. Colours are neutral on purpose (Yes is not always the good answer).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 85,
+            "insertNulls": 129600000,
+            "lineWidth": 1,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "#3b3f4a",
+                  "index": 1,
+                  "text": "No"
+                },
+                "1": {
+                  "color": "blue",
+                  "index": 0,
+                  "text": "Yes"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3b3f4a",
+                "value": null
+              }
+            ]
+          }
+        }
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "alignValue": "center",
+        "legend": {
+          "showLegend": false
+        },
+        "mergeValues": false,
+        "rowHeight": 0.9,
+        "showValue": "never",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ff0z3vnhywpogc"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT \"timestamp\" AS time, question AS metric, answered_yes::int AS value\nFROM whoop_export_journal\nWHERE $__timeFilter(\"timestamp\") AND answered_yes IS NOT NULL\nORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "Journal calendar",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff0z3vnhywpogc"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "max": 1,
+          "min": 0,
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 10,
+        "x": 0,
+        "y": 14
+      },
+      "id": 3,
+      "options": {
+        "displayMode": "gradient",
+        "namePlacement": "top",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Yes rate$/",
+          "values": true
+        },
+        "showUnfilled": true,
+        "text": {
+          "titleSize": 13,
+          "valueSize": 16
+        },
+        "valueMode": "color"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ff0z3vnhywpogc"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT question, AVG(answered_yes::int) AS \"Yes rate\"\nFROM whoop_export_journal\nWHERE $__timeFilter(\"timestamp\") AND answered_yes IS NOT NULL\nGROUP BY question\nORDER BY 2 DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "Yes rate per question",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff0z3vnhywpogc"
+      },
+      "description": "Average recovery / HRV on days where the answer was Yes versus No. Use the 'Recovery lag' variable to compare against the same cycle (0) or the next day (1). Few Yes or No days means the delta is noise.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          },
+          "decimals": 1
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Question"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 300
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "Δ.*"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red"
+                    },
+                    {
+                      "color": "text",
+                      "value": -1
+                    },
+                    {
+                      "color": "green",
+                      "value": 1
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*days"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 14,
+        "x": 10,
+        "y": 14
+      },
+      "id": 4,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ff0z3vnhywpogc"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT j.question AS \"Question\",\n  COUNT(*) FILTER (WHERE j.answered_yes) AS \"Yes days\",\n  COUNT(*) FILTER (WHERE NOT j.answered_yes) AS \"No days\",\n  AVG(c.recovery_score) FILTER (WHERE j.answered_yes) AS \"Recovery if yes\",\n  AVG(c.recovery_score) FILTER (WHERE NOT j.answered_yes) AS \"Recovery if no\",\n  AVG(c.recovery_score) FILTER (WHERE j.answered_yes) - AVG(c.recovery_score) FILTER (WHERE NOT j.answered_yes) AS \"Δ recovery\",\n  AVG(c.hrv_rmssd_ms) FILTER (WHERE j.answered_yes) - AVG(c.hrv_rmssd_ms) FILTER (WHERE NOT j.answered_yes) AS \"Δ HRV (ms)\"\nFROM whoop_export_journal j\nJOIN whoop_export_cycle c ON c.cycle_start::date = j.cycle_start::date + ${lag}\nWHERE $__timeFilter(j.\"timestamp\") AND j.answered_yes IS NOT NULL AND c.recovery_score IS NOT NULL\nGROUP BY j.question\nORDER BY 6",
+          "refId": "A"
+        }
+      ],
+      "title": "What the journal does to recovery",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 11,
+      "title": "Workouts (export)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff0z3vnhywpogc"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "lineWidth": 1,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
+          },
+          "decimals": 0,
+          "min": 0
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 25
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "table",
+          "placement": "right"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ff0z3vnhywpogc"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT $__timeGroupAlias(\"timestamp\",'1w'), sport_name AS metric, COUNT(*) AS workouts\nFROM whoop_export_workout\nWHERE $__timeFilter(\"timestamp\")\nGROUP BY 1, 2\nORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "Workouts per week",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff0z3vnhywpogc"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 1
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Workouts"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "Avg HR|Max HR|Avg kcal"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 25
+      },
+      "id": 7,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ff0z3vnhywpogc"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT sport_name AS \"Sport\", COUNT(*) AS \"Workouts\",\n  AVG(duration_ms)/60000.0 AS \"Avg min\",\n  AVG(strain) AS \"Avg strain\",\n  AVG(energy_kcal) AS \"Avg kcal\",\n  AVG(avg_heart_rate) AS \"Avg HR\",\n  AVG(max_heart_rate) AS \"Max HR\"\nFROM whoop_export_workout\nWHERE $__timeFilter(\"timestamp\")\nGROUP BY sport_name\nORDER BY 2 DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "Workouts per sport",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff0z3vnhywpogc"
+      },
+      "description": "Average share of workout time spent in each heart-rate zone.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 85,
+            "lineWidth": 0
+          },
+          "max": 100,
+          "min": 0,
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Z1"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#8ab8ff",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Z2"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#73bf69",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Z3"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#fade2a",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Z4"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#ff9830",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Z5"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f2495c",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 33
+      },
+      "id": 8,
+      "options": {
+        "barWidth": 0.8,
+        "legend": {
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "never",
+        "stacking": "normal",
+        "tooltip": {
+          "mode": "multi"
+        },
+        "xField": "Sport"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ff0z3vnhywpogc"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT sport_name AS \"Sport\",\n  AVG(zone_one_perc) AS \"Z1\",\n  AVG(zone_two_perc) AS \"Z2\",\n  AVG(zone_three_perc) AS \"Z3\",\n  AVG(zone_four_perc) AS \"Z4\",\n  AVG(zone_five_perc) AS \"Z5\"\nFROM whoop_export_workout\nWHERE $__timeFilter(\"timestamp\")\nGROUP BY sport_name\nORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "Heart-rate zones per sport",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ff0z3vnhywpogc"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "points",
+            "pointSize": 7,
+            "showPoints": "always"
+          },
+          "min": 0
+        }
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 33
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "count"
+          ],
+          "displayMode": "table",
+          "placement": "right"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ff0z3vnhywpogc"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT \"timestamp\" AS time, sport_name AS metric, strain AS value\nFROM whoop_export_workout\nWHERE $__timeFilter(\"timestamp\") AND strain IS NOT NULL\nORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "Strain per workout",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 42,
+  "tags": [
+    "whoop"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allowCustomValue": true,
+        "current": {
+          "text": "1",
+          "value": "1"
+        },
+        "description": "0 = recovery of the same cycle as the journal entry, 1 = the following day",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Recovery lag (days)",
+        "multi": false,
+        "name": "lag",
+        "options": [
+          {
+            "selected": false,
+            "text": "0",
+            "value": "0"
+          },
+          {
+            "selected": true,
+            "text": "1",
+            "value": "1"
+          }
+        ],
+        "query": "0,1",
+        "skipUrlSync": false,
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-90d",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Whoop — Export data (journal & workouts)",
+  "uid": "whoop-export"
+}
